@@ -13,17 +13,35 @@ class MainHandler(cqplus.CQPlusHandler):
             qq = params['from_qq']
             group = params['from_group']
             mess = ''
-            if msg == inst['0']:
+            if msg == inst['8']:
                 path = 'app/me.cqp.kizx.rollgames/notes'
                 if not os.path.exists(path):
                     os.mkdir(path)
                 mess = '初始化路径成功'
+            elif msg == inst['0']:
+                mess = '\n'.join(['\n    [CQ:face,id=76]本插件命令如下[CQ:face,id=77]',
+                                  '='*18,
+                                  '           我要roll游戏',
+                                  '          查看当前活动',
+                                  '我要参加roll游戏+游戏名',
+                                  '       查看名单+游戏名',
+                                  '     开使roll游戏+游戏名',
+                                  '       结束活动+游戏名',
+                                  '='*18,
+                                  '注意以上命令中+表示换行'])
             elif msg == inst['1']:
-                mess = '\n'.join(['欢迎老板Roll游戏！', '↓请严格按以下格式发送指令↓',
-                                  inst['2'], '游戏名称（注意相同名称会覆盖）', '描述（如15号开奖）'])
-            elif msg == inst['6']:
-                mess = '\n'.join(['本插件命令如下：', '我要roll游戏', '我要参加roll游戏\\n游戏名', '查看名单\\n游戏名',
-                                  '开始roll游戏\\n游戏名\\n中奖人数', '[CQ:face, id=30]注意以上命令中\\n代表换行，游戏名由roll游戏者指定，请确保每次活动的游戏名各不相同以避免冲突'])
+                mess = '\n'.join(['欢迎老板Roll游戏！',
+                                  '↓请按以下格式发送指令↓',
+                                  '='*22,
+                                  inst['2'],
+                                  '游戏名称（注意相同名称会覆盖）',
+                                  '描述（如15号开奖）'])
+            elif msg == inst['7']:
+                path = 'app/me.cqp.kizx.rollgames/notes'
+                acti = []
+                for filename in os.listdir(path):
+                    acti.append(os.path.splitext(filename)[0])
+                mess = '当前有如下活动：\n' + '\n'.join(acti)
             else:
                 strlist = msg.splitlines()
                 try:
@@ -35,11 +53,10 @@ class MainHandler(cqplus.CQPlusHandler):
                             info = self.api.get_group_member_info(
                                 group, qq, True)
                             name = info['card'] if info['card'] != '' else info['nickname']
-                            f.write('金主：' + str(qq) + ' - ' + name + '\n游戏：' + strlist[1] + '\n描述：' +
-                                    strlist[2])
-                        mess = '\n'.join(['您已成功发起Roll<' +
-                                          strlist[1] +
-                                          '>活动！', '↓发送以下命令参加活动↓', inst['3'], strlist[1],
+                            f.write('金主：' + str(qq) + ' - ' + name + '\n游戏：'
+                                    + strlist[1] + '\n描述：' + strlist[2])
+                        mess = '\n'.join(['您已成功发起Roll<' + strlist[1] + '>活动！',
+                                          '↓发送以下命令参加活动↓', inst['3'], strlist[1],
                                           '↓发送以下命令查看名单↓', inst['4'], strlist[1]])
                     # 报名参加活动
                     elif strlist[0] == inst['3']:
@@ -83,7 +100,7 @@ class MainHandler(cqplus.CQPlusHandler):
                             strlist[1] + '.txt'
                         with open(path, 'r') as f:
                             mastqq = f.readline().split('：')[1].split(' - ')[0]
-                        if str(qq) == mastqq:
+                        if str(qq) == mastqq or str(qq) == inst['9']:
                             with open(path, 'r') as f:
                                 memb = f.readlines()
                             memb.pop(0)
@@ -95,7 +112,18 @@ class MainHandler(cqplus.CQPlusHandler):
                                 lucky_qq = each.split(' - ')[0]
                                 mess = mess+'[CQ:at,qq='+lucky_qq+']'
                             mess = '恭喜欧皇' + mess + '获得了' + \
-                                strlist[1] + '\n没有获奖的小伙伴也不要沮丧哦~'
+                                strlist[1] + '\n没有获奖的小伙伴也不要沮丧哦~\nPS.确认无误后请用结束活动命令结束活动'
+                        else:
+                            mess = '你没有这个权限哦'
+                    # 结束活动
+                    elif strlist[0] == inst['6']:
+                        path = 'app/me.cqp.kizx.rollgames/notes/' + \
+                            strlist[1] + '.txt'
+                        with open(path, 'r') as f:
+                            mastqq = f.readline().split('：')[1].split(' - ')[0]
+                        if str(qq) == mastqq or str(qq) == inst['9']:
+                            os.remove(path)
+                            mess = '已成功删除' + strlist[1] + '活动！'
                         else:
                             mess = '你没有这个权限哦'
                 except IndexError:
@@ -112,8 +140,9 @@ class MainHandler(cqplus.CQPlusHandler):
         if event == "on_private_msg":
             msg = params['msg']
             qq = params['from_qq']
-            self.api.send_private_msg(3317200497, str(qq) + msg)
+            self.api.send_private_msg(int(inst['9']), str(qq) + msg)
 
 
-inst = {'0': '初始化', '1': '我要roll游戏', '2': '#我要roll游戏#',
-        '3': '我要参加roll游戏', '4': '查看名单', '5': '开始roll游戏', '6': '查看命令'}
+inst = {'0': '查看命令', '1': '我要roll游戏', '2': '#我要roll游戏#', '3': '我要参加roll游戏',
+        '4': '查看名单', '5': '开始roll游戏', '6': '结束活动', '7': '查看当前活动', '8': '初始化',
+        '9': '3317200497'}
