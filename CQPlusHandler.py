@@ -22,8 +22,8 @@ class MainHandler(cqplus.CQPlusHandler):
                 mess = '\n'.join(['欢迎老板Roll游戏！', '↓请严格按以下格式发送指令↓',
                                   inst['2'], '游戏名称（注意相同名称会覆盖）', '描述（如15号开奖）'])
             elif msg == inst['6']:
-                mess = '\n'.join(['本插件命令如下：', '我要roll游戏', '我要参加roll游戏/n游戏名', '查看名单/n游戏名',
-                                  '开始roll游戏/n游戏名/n中奖人数', '[CQ:face, id=30]注意以上命令中/n代表换行，游戏名由roll游戏者指定，请确保每次活动的游戏名各不相同以避免冲突'])
+                mess = '\n'.join(['本插件命令如下：', '我要roll游戏', '我要参加roll游戏\\n游戏名', '查看名单\\n游戏名',
+                                  '开始roll游戏\\n游戏名\\n中奖人数', '[CQ:face, id=30]注意以上命令中\\n代表换行，游戏名由roll游戏者指定，请确保每次活动的游戏名各不相同以避免冲突'])
             else:
                 strlist = msg.splitlines()
                 try:
@@ -35,8 +35,8 @@ class MainHandler(cqplus.CQPlusHandler):
                             info = self.api.get_group_member_info(
                                 group, qq, True)
                             name = info['card'] if info['card'] != '' else info['nickname']
-                            f.write('发起人：' + str(qq) + ' - ' + name + '\n游戏：' + strlist[1] + '\n描述：' +
-                                    strlist[2] + '\n')
+                            f.write('金主：' + str(qq) + ' - ' + name + '\n游戏：' + strlist[1] + '\n描述：' +
+                                    strlist[2])
                         mess = '\n'.join(['您已成功发起Roll<' +
                                           strlist[1] +
                                           '>活动！', '↓发送以下命令参加活动↓', inst['3'], strlist[1],
@@ -54,7 +54,7 @@ class MainHandler(cqplus.CQPlusHandler):
                                 info = self.api.get_group_member_info(
                                     group, qq, True)
                                 name = info['card'] if info['card'] != '' else info['nickname']
-                                f.write(str(qq) + ' - ' + name + '\n')
+                                f.write('\n' + str(qq) + ' - ' + name)
                             mess = '恭喜您已成功报名参加roll<' + strlist[1] + '>'
                         else:
                             mess = '您已经参加过了哦，请勿重复报名'
@@ -63,14 +63,27 @@ class MainHandler(cqplus.CQPlusHandler):
                         path = 'app/me.cqp.kizx.rollgames/notes/' + \
                             strlist[1] + '.txt'
                         with open(path, 'r') as f:
-                            mess = ''.join(f.readlines())
+                            mastqq = f.readline().split('：')[1].split(' - ')[0]
+                            mastqqan = mastqq[:3] + '****' + mastqq[7:]
+                            f.seek(0, 0)
+                            messlist = []
+                            for index, line in enumerate(f):
+                                if index == 0:
+                                    line = line.replace(mastqq, mastqqan)
+                                    messlist.append(line)
+                                elif index >= 3:
+                                    messlist.append(
+                                        line[:3] + '****' + line[7:])
+                                else:
+                                    messlist.append(line)
+                        mess = '\n' + ''.join(messlist)
                     # 开奖
                     elif strlist[0] == inst['5']:
                         path = 'app/me.cqp.kizx.rollgames/notes/' + \
                             strlist[1] + '.txt'
                         with open(path, 'r') as f:
-                            masqq = f.readline().split('：')[1].split(' - ')[0]
-                        if str(qq) == masqq:
+                            mastqq = f.readline().split('：')[1].split(' - ')[0]
+                        if str(qq) == mastqq:
                             with open(path, 'r') as f:
                                 memb = f.readlines()
                             memb.pop(0)
