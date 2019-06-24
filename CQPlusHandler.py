@@ -5,6 +5,8 @@ import os
 import random
 
 
+
+
 class MainHandler(cqplus.CQPlusHandler):
     def handle_event(self, event, params):
         # 处理群聊消息
@@ -14,21 +16,20 @@ class MainHandler(cqplus.CQPlusHandler):
             group = params['from_group']
             mess = ''
             if msg == inst['8']:
-                path = 'app/me.cqp.kizx.rollgames/notes'
+                path = 'app/me.cqp.kizx.rollgames/activities'
                 if not os.path.exists(path):
                     os.mkdir(path)
                 mess = '初始化路径成功'
             elif msg == inst['0']:
-                mess = '\n'.join(['\n    [CQ:face,id=76]本插件命令如下[CQ:face,id=77]',
-                                  '='*18,
-                                  '           我要roll游戏',
-                                  '          查看当前活动',
-                                  '我要参加roll游戏+游戏名',
-                                  '       查看名单+游戏名',
-                                  '     开使roll游戏+游戏名',
-                                  '       结束活动+游戏名',
-                                  '='*18,
-                                  '注意以上命令中+表示换行'])
+                mess = '\n'.join(['\n====本插件命令如下====',                                  
+                                  inst['1'],
+                                  inst['7'],
+                                  inst['3']+'+游戏名',
+                                  inst['4']+'+游戏名',
+                                  inst['5']+'+游戏名+中奖人数',
+                                  inst['6']+'+游戏名',
+                                  '='*20,
+                                  '[CQ:face,id=29]注意以上命令中+表示换行'])
             elif msg == inst['1']:
                 mess = '\n'.join(['欢迎老板Roll游戏！',
                                   '↓请按以下格式发送指令↓',
@@ -37,7 +38,7 @@ class MainHandler(cqplus.CQPlusHandler):
                                   '游戏名称（注意相同名称会覆盖）',
                                   '描述（如15号开奖）'])
             elif msg == inst['7']:
-                path = 'app/me.cqp.kizx.rollgames/notes'
+                path = 'app/me.cqp.kizx.rollgames/activities'
                 acti = []
                 for filename in os.listdir(path):
                     acti.append(os.path.splitext(filename)[0])
@@ -47,7 +48,7 @@ class MainHandler(cqplus.CQPlusHandler):
                 try:
                     # 发起活动
                     if strlist[0] == inst['2']:
-                        path = 'app/me.cqp.kizx.rollgames/notes/' + \
+                        path = 'app/me.cqp.kizx.rollgames/activities/' + \
                             strlist[1] + '.txt'
                         with open(path, 'w') as f:
                             info = self.api.get_group_member_info(
@@ -60,7 +61,7 @@ class MainHandler(cqplus.CQPlusHandler):
                                           '↓发送以下命令查看名单↓', inst['4'], strlist[1]])
                     # 报名参加活动
                     elif strlist[0] == inst['3']:
-                        path = 'app/me.cqp.kizx.rollgames/notes/' + \
+                        path = 'app/me.cqp.kizx.rollgames/activities/' + \
                             strlist[1] + '.txt'
                         memb = []
                         with open(path, 'r') as f:
@@ -77,7 +78,7 @@ class MainHandler(cqplus.CQPlusHandler):
                             mess = '您已经参加过了哦，请勿重复报名'
                     # 查看参加成员
                     elif strlist[0] == inst['4']:
-                        path = 'app/me.cqp.kizx.rollgames/notes/' + \
+                        path = 'app/me.cqp.kizx.rollgames/activities/' + \
                             strlist[1] + '.txt'
                         with open(path, 'r') as f:
                             mastqq = f.readline().split('：')[1].split(' - ')[0]
@@ -96,7 +97,7 @@ class MainHandler(cqplus.CQPlusHandler):
                         mess = '\n' + ''.join(messlist)
                     # 开奖
                     elif strlist[0] == inst['5']:
-                        path = 'app/me.cqp.kizx.rollgames/notes/' + \
+                        path = 'app/me.cqp.kizx.rollgames/activities/' + \
                             strlist[1] + '.txt'
                         with open(path, 'r') as f:
                             mastqq = f.readline().split('：')[1].split(' - ')[0]
@@ -111,13 +112,14 @@ class MainHandler(cqplus.CQPlusHandler):
                             for each in lucky:
                                 lucky_qq = each.split(' - ')[0]
                                 mess = mess+'[CQ:at,qq='+lucky_qq+']'
-                            mess = '恭喜欧皇' + mess + '获得了' + \
-                                strlist[1] + '\n没有获奖的小伙伴也不要沮丧哦~\nPS.确认无误后请用结束活动命令结束活动'
+                            mess = '[CQ:face,id=99]恭喜欧皇' + mess + '获得了' + \
+                                strlist[1] + \
+                                '\n[CQ:face,id=30]没有获奖的小伙伴也不要沮丧哦~\nPS.确认无误后请用结束活动命令结束活动'
                         else:
                             mess = '你没有这个权限哦'
                     # 结束活动
                     elif strlist[0] == inst['6']:
-                        path = 'app/me.cqp.kizx.rollgames/notes/' + \
+                        path = 'app/me.cqp.kizx.rollgames/activities/' + \
                             strlist[1] + '.txt'
                         with open(path, 'r') as f:
                             mastqq = f.readline().split('：')[1].split(' - ')[0]
