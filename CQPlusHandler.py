@@ -129,7 +129,7 @@ class Handlein:
             for each in lucky:
                 lucky_qq = each.split(' - ')[0]
                 mess = mess+'[CQ:at,qq='+lucky_qq+']'
-            mess = '[CQ:face,id=99]恭喜欧皇' + mess + '获得了' + game + \
+            mess = '\n[CQ:face,id=99]恭喜欧皇' + mess + '获得了' + game + \
                 '\n[CQ:face,id=30]没有获奖的小伙伴也不要沮丧哦~\nPS.确认无误后请用结束活动命令删除活动'
         else:
             mess = '你没有这个权限哦'
