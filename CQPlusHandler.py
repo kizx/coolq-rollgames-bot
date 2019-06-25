@@ -5,8 +5,6 @@ import os
 import random
 
 
-
-
 class MainHandler(cqplus.CQPlusHandler):
     def handle_event(self, event, params):
         # 处理群聊消息
