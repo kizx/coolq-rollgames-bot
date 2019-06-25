@@ -2,7 +2,7 @@
 
 import cqplus
 import os
-import random
+from random import sample
 
 
 class Handle():
@@ -22,7 +22,7 @@ class Handle():
                           inst['7'],
                           inst['3']+'+游戏名',
                           inst['4']+'+游戏名',
-                          inst['5']+'+游戏名+中奖人数',
+                          inst['5'],
                           inst['6']+'+游戏名',
                           '='*20,
                           '[CQ:face,id=29]注意以上命令中+表示换行'])
@@ -38,9 +38,9 @@ class Handle():
         return mess
 
     def wantroll(self):
-        '''我要roll游戏'''
-        mess = '\n'.join(['欢迎老板Roll游戏！',
-                          '====请按以下格式发送指令====',
+        '''我要roll游戏格式'''
+        mess = '\n'.join(['欢迎老板roll游戏！',
+                          '====请按以下格式新建活动====',
                           inst['2'],
                           '游戏名称（注意相同名称会覆盖）',
                           '描述（如15号开奖）'])
@@ -65,8 +65,16 @@ class Handle():
         mess = '\n' + ''.join(messlist)
         return mess
 
+    def how_roll(self):
+        '''roll游戏格式'''
+        mess = '\n'.join(['\n===请按以下格式roll游戏===',
+                          inst['9'],
+                          '游戏名',
+                          '中奖人数(不写默认为1)'])
+        return mess
 
-class Handlein(cqplus.CQPlusHandler):
+
+class Handlein:
 
     def __init__(self, Env, QQ, Group):
         self.qq = QQ
@@ -80,11 +88,11 @@ class Handlein(cqplus.CQPlusHandler):
             info = cqplus._api.get_group_member_info(
                 self.env, self.group, self.qq, True)
             name = info['card'] if info['card'] != '' else info['nickname']
-            f.write('金主：' + str(self.qq) + ' - ' + name + '\n游戏：'
-                    + game + '\n描述：' + desc)
-        mess = '\n'.join(['您已成功发起Roll<' + game + '>活动！',
-                          '↓发送以下命令参加活动↓', inst['3'], game,
-                          '↓发送以下命令查看名单↓', inst['4'], game])
+            f.write('金主：' + str(self.qq) + ' - ' +
+                    name + '\n游戏：' + game + '\n描述：' + desc)
+        mess = '\n'.join(['\n您已成功发起roll<' + game + '>活动！',
+                          '===发送以下命令参加活动===', inst['3'], game,
+                          '===发送以下命令查看名单===', inst['4'], game])
         return mess
 
     def join(self, game):
@@ -102,7 +110,7 @@ class Handlein(cqplus.CQPlusHandler):
                 f.write('\n' + str(self.qq) + ' - ' + name)
             mess = '恭喜您已成功报名参加roll<' + game + '>'
         else:
-            mess = '您已经参加过了哦，请勿重复报名'
+            mess = '你已经参加过了哦，请勿重复报名'
         return mess
 
     def roll(self, game, num=1):
@@ -110,19 +118,19 @@ class Handlein(cqplus.CQPlusHandler):
         path = 'app/me.cqp.kizx.rollgames/activities/' + game + '.txt'
         with open(path, 'r') as f:
             mastqq = f.readline().split('：')[1].split(' - ')[0]
-        if str(self.qq) == mastqq or str(self.qq) == inst['9']:
+        if str(self.qq) == mastqq or str(self.qq) == inst['10']:
             with open(path, 'r') as f:
                 memb = f.readlines()
             memb.pop(0)
             memb.pop(0)
             memb.pop(0)
-            lucky = random.sample(memb, int(num))
+            lucky = sample(memb, int(num))
             mess = ''
             for each in lucky:
                 lucky_qq = each.split(' - ')[0]
                 mess = mess+'[CQ:at,qq='+lucky_qq+']'
             mess = '[CQ:face,id=99]恭喜欧皇' + mess + '获得了' + game + \
-                '\n[CQ:face,id=30]没有获奖的小伙伴也不要沮丧哦~\nPS.确认无误后请用结束活动命令结束活动'
+                '\n[CQ:face,id=30]没有获奖的小伙伴也不要沮丧哦~\nPS.确认无误后请用结束活动命令删除活动'
         else:
             mess = '你没有这个权限哦'
         return mess
@@ -132,7 +140,7 @@ class Handlein(cqplus.CQPlusHandler):
         path = 'app/me.cqp.kizx.rollgames/activities/' + game + '.txt'
         with open(path, 'r') as f:
             mastqq = f.readline().split('：')[1].split(' - ')[0]
-        if str(self.qq) == mastqq or str(self.qq) == inst['9']:
+        if str(self.qq) == mastqq or str(self.qq) == inst['10']:
             os.remove(path)
             mess = '已成功删除' + game + '活动！'
         else:
@@ -158,6 +166,9 @@ class MainHandler(cqplus.CQPlusHandler):
             elif msg == inst['7']:
                 msgHandle = Handle()
                 mess = msgHandle.view_acti()
+            elif msg == inst['5']:
+                msgHandle = Handle()
+                mess = msgHandle.how_roll()
             else:
                 strlist = msg.splitlines()
                 try:
@@ -172,10 +183,13 @@ class MainHandler(cqplus.CQPlusHandler):
                     elif strlist[0] == inst['4']:
                         msgHandle = Handle()
                         mess = msgHandle.view_memb(strlist[1])
-                    elif strlist[0] == inst['5']:
+                    elif strlist[0] == inst['9']:
                         msgHandlein = Handlein(
                             params['env'], params['from_qq'], params['from_group'])
-                        mess = msgHandlein.roll(strlist[1], strlist[2])
+                        if len(strlist) == 2:
+                            mess = msgHandlein.roll(strlist[1])
+                        else:
+                            mess = msgHandlein.roll(strlist[1], strlist[2])
                     elif strlist[0] == inst['6']:
                         msgHandlein = Handlein(
                             params['env'], params['from_qq'], params['from_group'])
@@ -199,4 +213,4 @@ class MainHandler(cqplus.CQPlusHandler):
 
 inst = {'0': '查看命令', '1': '我要roll游戏', '2': '#我要roll游戏#', '3': '我要参加roll游戏',
         '4': '查看名单', '5': '开始roll游戏', '6': '结束活动', '7': '查看当前活动', '8': '初始化',
-        '9': '3317200497'}
+        '9': '#开始roll游戏#', '10': '3317200497'}
