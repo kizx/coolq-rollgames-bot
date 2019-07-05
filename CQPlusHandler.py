@@ -34,7 +34,10 @@ class Handle():
         acti = []
         for filename in os.listdir(path):
             acti.append(os.path.splitext(filename)[0])
-        mess = '当前有如下活动：\n' + '\n'.join(acti)
+        if acti == []:
+            mess = '当前没有活动哦~要不你来一个[CQ:face,id=178]'
+        else:
+            mess = '当前有如下活动：\n' + '\n'.join(acti)
         return mess
 
     def wantroll(self):
