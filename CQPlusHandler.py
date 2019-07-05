@@ -154,52 +154,63 @@ class MainHandler(cqplus.CQPlusHandler):
         if event == "on_group_msg":
             msg = params['msg']
             mess = ''
-            if msg == inst['8']:
+            if msg in dic1:
                 msgHandle = Handle()
-                mess = msgHandle.pathinit()
-            elif msg == inst['0']:
-                msgHandle = Handle()
-                mess = msgHandle.menu()
-            elif msg == inst['1']:
-                msgHandle = Handle()
-                mess = msgHandle.wantroll()
-            elif msg == inst['7']:
-                msgHandle = Handle()
-                mess = msgHandle.view_acti()
-            elif msg == inst['5']:
-                msgHandle = Handle()
-                mess = msgHandle.how_roll()
+                mess = dic1[msg](msgHandle)
+            # if msg == inst['8']:
+            #     msgHandle = Handle()
+            #     mess = msgHandle.pathinit()
+            # elif msg == inst['0']:
+            #     msgHandle = Handle()
+            #     mess = msgHandle.menu()
+            # elif msg == inst['1']:
+            #     msgHandle = Handle()
+            #     mess = msgHandle.wantroll()
+            # elif msg == inst['7']:
+            #     msgHandle = Handle()
+            #     mess = msgHandle.view_acti()
+            # elif msg == inst['5']:
+            #     msgHandle = Handle()
+            #     mess = msgHandle.how_roll()
             else:
                 strlist = msg.splitlines()
-                try:
-                    if strlist[0] == inst['2']:
-                        msgHandlein = Handlein(
-                            params['env'], params['from_qq'], params['from_group'])
-                        mess = msgHandlein.create(strlist[1], strlist[2])
-                    elif strlist[0] == inst['3']:
-                        msgHandlein = Handlein(
-                            params['env'], params['from_qq'], params['from_group'])
-                        mess = msgHandlein.join(strlist[1])
-                    elif strlist[0] == inst['4']:
-                        msgHandle = Handle()
-                        mess = msgHandle.view_memb(strlist[1])
-                    elif strlist[0] == inst['9']:
-                        msgHandlein = Handlein(
-                            params['env'], params['from_qq'], params['from_group'])
-                        if len(strlist) == 2:
-                            mess = msgHandlein.roll(strlist[1])
-                        else:
-                            mess = msgHandlein.roll(strlist[1], strlist[2])
-                    elif strlist[0] == inst['6']:
-                        msgHandlein = Handlein(
-                            params['env'], params['from_qq'], params['from_group'])
-                        mess = msgHandlein.endgame(strlist[1])
-                except IndexError:
-                    mess = '输入的指令不完整！'
-                except ValueError:
-                    mess = '输入的指令格式有误！'
-                except FileNotFoundError:
-                    mess = '输入的活动不存在！'
+                if strlist[0] in dic2:
+                    msgHandlein = Handlein(
+                        params['env'], params['from_qq'], params['from_group'])
+                    try:
+                        # if strlist[0] in dic2:
+                        #     msgHandlein = Handlein(
+                        #         params['env'], params['from_qq'], params['from_group'])
+                        #     mess = dic2[strlist[0]](
+                        #         msgHandlein, strlist[1], strlist[2])
+                        if strlist[0] == inst['2']:
+                            # msgHandlein = Handlein(
+                            #     params['env'], params['from_qq'], params['from_group'])
+                            mess = msgHandlein.create(strlist[1], strlist[2])
+                        elif strlist[0] == inst['3']:
+                            # msgHandlein = Handlein(
+                            #     params['env'], params['from_qq'], params['from_group'])
+                            mess = msgHandlein.join(strlist[1])
+                        elif strlist[0] == inst['4']:
+                            msgHandle = Handle()
+                            mess = msgHandle.view_memb(strlist[1])
+                        elif strlist[0] == inst['9']:
+                            # msgHandlein = Handlein(
+                            #     params['env'], params['from_qq'], params['from_group'])
+                            if len(strlist) == 2:
+                                mess = msgHandlein.roll(strlist[1])
+                            else:
+                                mess = msgHandlein.roll(strlist[1], strlist[2])
+                        elif strlist[0] == inst['6']:
+                            # msgHandlein = Handlein(
+                            #     params['env'], params['from_qq'], params['from_group'])
+                            mess = msgHandlein.endgame(strlist[1])
+                    except IndexError:
+                        mess = '输入的指令不完整！'
+                    except ValueError:
+                        mess = '输入的指令格式有误！'
+                    except FileNotFoundError:
+                        mess = '输入的活动不存在！'
             if mess != '':
                 mess = '[CQ:at,qq=' + str(params['from_qq']) + ']' + mess
                 self.api.send_group_msg(params['from_group'], mess)
@@ -208,9 +219,13 @@ class MainHandler(cqplus.CQPlusHandler):
         if event == "on_private_msg":
             msg = params['msg']
             qq = params['from_qq']
-            self.api.send_private_msg(int(inst['9']), str(qq) + msg)
+            self.api.send_private_msg(int(inst['10']), str(qq) + msg)
 
 
 inst = {'0': '查看命令', '1': '我要roll游戏', '2': '#我要roll游戏#', '3': '我要参加roll游戏',
         '4': '查看名单', '5': '开始roll游戏', '6': '结束活动', '7': '查看当前活动', '8': '初始化',
         '9': '#开始roll游戏#', '10': '3317200497'}
+dic1 = {'查看命令': Handle.menu, '我要roll游戏': Handle.wantroll, '查看当前活动': Handle.view_acti,
+        '开始roll游戏': Handle.how_roll, '初始化': Handle.pathinit}
+dic2 = {'#我要roll游戏#': Handlein.create, '我要参加roll游戏': Handlein.join, '查看名单': Handle.view_memb,
+        '#开始roll游戏#': Handlein.roll, '结束活动': Handlein.endgame}
