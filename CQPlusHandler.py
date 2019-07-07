@@ -109,7 +109,7 @@ class Handlein:
             with open(path, 'a') as f:
                 info = cqplus._api.get_group_member_info(
                     self.env, self.group, self.qq, True)
-                name = info['card'] if info['card'] != '' else info['nickname']
+                name = info['card'] or info['nickname']
                 f.write('\n' + str(self.qq) + ' - ' + name)
             mess = '恭喜您已成功报名参加roll<' + game + '>'
         else:
@@ -159,54 +159,26 @@ class MainHandler(cqplus.CQPlusHandler):
             mess = ''
             if msg in dic1:
                 msgHandle = Handle()
-                mess = dic1[msg](msgHandle)
-            # if msg == inst['8']:
-            #     msgHandle = Handle()
-            #     mess = msgHandle.pathinit()
-            # elif msg == inst['0']:
-            #     msgHandle = Handle()
-            #     mess = msgHandle.menu()
-            # elif msg == inst['1']:
-            #     msgHandle = Handle()
-            #     mess = msgHandle.wantroll()
-            # elif msg == inst['7']:
-            #     msgHandle = Handle()
-            #     mess = msgHandle.view_acti()
-            # elif msg == inst['5']:
-            #     msgHandle = Handle()
-            #     mess = msgHandle.how_roll()
+                mess = dic1[msg](msgHandle)            
             else:
                 strlist = msg.splitlines()
                 if strlist[0] in dic2:
                     msgHandlein = Handlein(
                         params['env'], params['from_qq'], params['from_group'])
-                    try:
-                        # if strlist[0] in dic2:
-                        #     msgHandlein = Handlein(
-                        #         params['env'], params['from_qq'], params['from_group'])
-                        #     mess = dic2[strlist[0]](
-                        #         msgHandlein, strlist[1], strlist[2])
-                        if strlist[0] == inst['2']:
-                            # msgHandlein = Handlein(
-                            #     params['env'], params['from_qq'], params['from_group'])
+                    try:                        
+                        if strlist[0] == inst['2']:                            
                             mess = msgHandlein.create(strlist[1], strlist[2])
-                        elif strlist[0] == inst['3']:
-                            # msgHandlein = Handlein(
-                            #     params['env'], params['from_qq'], params['from_group'])
+                        elif strlist[0] == inst['3']:                            
                             mess = msgHandlein.join(strlist[1])
                         elif strlist[0] == inst['4']:
                             msgHandle = Handle()
                             mess = msgHandle.view_memb(strlist[1])
-                        elif strlist[0] == inst['9']:
-                            # msgHandlein = Handlein(
-                            #     params['env'], params['from_qq'], params['from_group'])
+                        elif strlist[0] == inst['9']:                            
                             if len(strlist) == 2:
                                 mess = msgHandlein.roll(strlist[1])
                             else:
                                 mess = msgHandlein.roll(strlist[1], strlist[2])
-                        elif strlist[0] == inst['6']:
-                            # msgHandlein = Handlein(
-                            #     params['env'], params['from_qq'], params['from_group'])
+                        elif strlist[0] == inst['6']:                            
                             mess = msgHandlein.endgame(strlist[1])
                     except IndexError:
                         mess = '输入的指令不完整！'
