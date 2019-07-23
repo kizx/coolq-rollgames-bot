@@ -24,6 +24,7 @@ class Handle():
                           inst['4']+'+游戏名',
                           inst['5'],
                           inst['6']+'+游戏名',
+                          inst['11']+'+开启/关闭'
                           '='*20,
                           '[CQ:face,id=29]注意以上命令中+表示换行'])
         return mess
@@ -35,7 +36,7 @@ class Handle():
         for filename in os.listdir(path):
             acti.append(os.path.splitext(filename)[0])
         if acti == []:
-            mess = '当前没有活动哦~要不你来一个[CQ:face,id=178]'
+            mess = '当前没有活动哦~要不你来整一个[CQ:face,id=178]'
         else:
             mess = '当前有如下活动：\n' + '\n'.join(acti)
         return mess
@@ -150,6 +151,20 @@ class Handlein:
             mess = '你没有这个权限哦'
         return mess
 
+    def timer_swich(self, isoff):
+        '''定时播报开关'''
+        path = 'app/me.cqp.kizx.rollgames/setting.ini'
+        if isoff == '开启' or isoff == '关闭':
+            if str(self.qq) == inst['10']:
+                with open(path, 'w') as f:
+                    f.write(str(self.group) + ' - ' + isoff)
+                    mess = '定时播报已' + isoff
+            else:
+                mess = '你没有这个权限哦'
+        else:
+            mess = '输入的指令格式有误！'
+        return mess
+
 
 class MainHandler(cqplus.CQPlusHandler):
     def handle_event(self, event, params):
@@ -159,27 +174,29 @@ class MainHandler(cqplus.CQPlusHandler):
             mess = ''
             if msg in dic1:
                 msgHandle = Handle()
-                mess = dic1[msg](msgHandle)            
+                mess = dic1[msg](msgHandle)
             else:
                 strlist = msg.splitlines()
                 if strlist[0] in dic2:
                     msgHandlein = Handlein(
                         params['env'], params['from_qq'], params['from_group'])
-                    try:                        
-                        if strlist[0] == inst['2']:                            
+                    try:
+                        if strlist[0] == inst['2']:
                             mess = msgHandlein.create(strlist[1], strlist[2])
-                        elif strlist[0] == inst['3']:                            
+                        elif strlist[0] == inst['3']:
                             mess = msgHandlein.join(strlist[1])
                         elif strlist[0] == inst['4']:
                             msgHandle = Handle()
                             mess = msgHandle.view_memb(strlist[1])
-                        elif strlist[0] == inst['9']:                            
+                        elif strlist[0] == inst['9']:
                             if len(strlist) == 2:
                                 mess = msgHandlein.roll(strlist[1])
                             else:
                                 mess = msgHandlein.roll(strlist[1], strlist[2])
-                        elif strlist[0] == inst['6']:                            
+                        elif strlist[0] == inst['6']:
                             mess = msgHandlein.endgame(strlist[1])
+                        elif strlist[0] == inst['11']:
+                            mess = msgHandlein.timer_swich(strlist[1])
                     except IndexError:
                         mess = '输入的指令不完整！'
                     except ValueError:
@@ -190,17 +207,34 @@ class MainHandler(cqplus.CQPlusHandler):
                 mess = '[CQ:at,qq=' + str(params['from_qq']) + ']' + mess
                 self.api.send_group_msg(params['from_group'], mess)
 
+        # 定时器消息
+        if event == 'on_timer':
+            if params['name'] == 'timer01':
+                path = 'app/me.cqp.kizx.rollgames/setting.ini'
+                with open(path, 'r') as f:
+                    setting = f.readline().split(' - ')
+                    if setting[1] == '开启':
+                        msgHandle = Handle()
+                        mess = msgHandle.view_acti()
+                        if mess != '当前没有活动哦~要不你来整一个[CQ:face,id=178]':
+                            self.api.send_group_msg(int(setting[0]), mess)
+
+        # 菜单动作
+        # if event == 'on_menu':
+        #     if params['name'] == 'menu01':
+        #         self.api.send_group_msg(562360425, '菜单01被点击')
+
         # 处理私聊消息
-        if event == "on_private_msg":
-            msg = params['msg']
-            qq = params['from_qq']
-            self.api.send_private_msg(int(inst['10']), str(qq) + msg)
+        # if event == "on_private_msg":
+        #     msg = params['msg']
+        #     qq = params['from_qq']
+        #     self.api.send_private_msg(int(inst['10']), str(qq) + '发送了：' + msg)
 
 
 inst = {'0': '查看命令', '1': '我要roll游戏', '2': '#我要roll游戏#', '3': '我要参加roll游戏',
         '4': '查看名单', '5': '开始roll游戏', '6': '结束活动', '7': '查看当前活动', '8': '初始化',
-        '9': '#开始roll游戏#', '10': '3317200497'}
+        '9': '#开始roll游戏#', '10': '3317200497', '11': '定时器'}
 dic1 = {'查看命令': Handle.menu, '我要roll游戏': Handle.wantroll, '查看当前活动': Handle.view_acti,
         '开始roll游戏': Handle.how_roll, '初始化': Handle.pathinit}
 dic2 = {'#我要roll游戏#': Handlein.create, '我要参加roll游戏': Handlein.join, '查看名单': Handle.view_memb,
-        '#开始roll游戏#': Handlein.roll, '结束活动': Handlein.endgame}
+        '#开始roll游戏#': Handlein.roll, '结束活动': Handlein.endgame, '定时器': Handlein.timer_swich}
