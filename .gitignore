@@ -104,6 +104,6 @@ venv.bak/
 .mypy_cache/
 
 # My configurations:
-settings.json/
+*.json
 activities/
-setting.ini/
+*.ini
