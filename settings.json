@@ -1,0 +1,7 @@
+{
+    "DEBUG": true,
+    "TIMER": {
+        "timer01": 36000
+    },
+    "RUNTIME_NAME": "Python37"
+}
