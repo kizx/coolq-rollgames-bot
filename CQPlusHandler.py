@@ -3,6 +3,7 @@
 import cqplus
 import os
 from random import sample
+import sqlite3
 
 
 class Handle():
