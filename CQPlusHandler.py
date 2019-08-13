@@ -11,7 +11,7 @@ class sqlHandle:
         self.env = Env
         self.qq = QQ
         self.group = Group
-        self.con = sqlite3.connect('activities.db')
+        self.con = sqlite3.connect('app/me.cqp.kizx.rollgames/activities.db')
         self.cur = self.con.cursor()
 
     def __del__(self):
@@ -58,7 +58,7 @@ class sqlHandle:
         if self.qq in mastqq:
             self.cur.execute('select qq,name from '+game+' where id>1')
             memlist = self.cur.fetchall()
-            mess = '\n已报名参加'+game+'名单：'
+            mess = '\n已报名参加'+game+'名单如下：'
             for row in memlist:
                 miqq = str(row[0])
                 anqq = miqq[:3] + '****' + miqq[7:]
@@ -102,7 +102,7 @@ class sqlHandle:
         '''定时播报开关'''
         path = 'app/me.cqp.kizx.rollgames/setting.ini'
         if isoff == '开启' or isoff == '关闭':
-            if str(self.qq) == inst['10']:
+            if self.qq == inst['10']:
                 with open(path, 'w') as f:
                     f.write(str(self.group) + ' - ' + isoff)
                     mess = '定时播报已' + isoff
@@ -121,9 +121,9 @@ class Handle():
                           inst['2']+'+游戏名',
                           inst['3']+'+游戏名',
                           inst['4']+'+游戏名',
-                          inst['5'], '+游戏名',
-                          inst['7'],
+                          inst['9']+'+游戏名',
                           inst['6']+'+游戏名',
+                          inst['7'],
                           inst['11']+'+开启/关闭',
                           '='*20,
                           '[CQ:face,id=29]注意以上命令中+表示换行'])
@@ -131,7 +131,7 @@ class Handle():
 
     def view_acti(self):
         '''查看当前活动'''
-        con = sqlite3.connect('activities.db')
+        con = sqlite3.connect('app/me.cqp.kizx.rollgames/activities.db')
         cur = con.cursor()
         cur.execute("select name from sqlite_sequence")
         acti = []
@@ -140,7 +140,7 @@ class Handle():
         if acti == []:
             mess = '当前没有活动哦~要不你来整一个[CQ:face,id=178]'
         else:
-            mess = '\n当前有如下活动：\n' + '\n'.join(acti)
+            mess = '当前有如下活动：\n' + '\n'.join(acti)
         cur.close()
         con.close()
         return mess
@@ -172,7 +172,7 @@ class MainHandler(cqplus.CQPlusHandler):
                 mess = '[CQ:at,qq=' + str(params['from_qq']) + ']' + mess
                 self.api.send_group_msg(params['from_group'], mess)
 
-        # 定时器消息
+        # 定时器消息(功能有待完善)
         if event == 'on_timer':
             if params['name'] == '1min':
                 path = 'app/me.cqp.kizx.rollgames/setting.ini'
@@ -196,8 +196,8 @@ class MainHandler(cqplus.CQPlusHandler):
         #     self.api.send_private_msg(inst['10'], str(qq) + '发送了：' + msg)
 
 
-inst = {'0': '查看命令', '2': '#我要roll游戏#', '3': '我要参加roll游戏', '4': '查看名单',
-        '6': '结束活动', '7': '查看当前活动', '9': '#开始roll游戏#', '10': 3317200497, '11': '定时器'}
+inst = {'0': '查看命令', '2': '!!!我要roll游戏#', '3': '我要参加roll游戏', '4': '查看名单',
+        '6': '结束活动', '7': '查看当前活动', '9': '!!!开始roll游戏', '10': 3317200497, '11': '定时器'}
 dic1 = {'查看命令': Handle.menu, '查看当前活动': Handle.view_acti}
-dic2 = {'#我要roll游戏#': sqlHandle.create, '我要参加roll游戏': sqlHandle.join, '查看名单': sqlHandle.view_memb,
-        '#开始roll游戏#': sqlHandle.roll, '结束活动': sqlHandle.endgame, '定时器': sqlHandle.timer_swich}
+dic2 = {'!!!我要roll游戏': sqlHandle.create, '我要参加roll游戏': sqlHandle.join, '查看名单': sqlHandle.view_memb,
+        '!!!开始roll游戏': sqlHandle.roll, '结束活动': sqlHandle.endgame, '定时器': sqlHandle.timer_swich}

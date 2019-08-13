@@ -7,7 +7,7 @@
 * 支持同时进行多个Roll游戏活动
 * 发送“查看命令”可查看所有命令
 * 使用案例：
-![](https://wx1.sinaimg.cn/mw690/006tUGa1ly1g4dr93vug1j30u05ose35.jpg "使用案例")
+![](https://ws4.sinaimg.cn/large/006tUGa1ly1g5ybuvg7j6j30u049xqho.jpg "使用案例")
 
 ## 更新日志
 + ver1.0 实现基本功能
