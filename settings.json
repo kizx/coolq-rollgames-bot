@@ -1,7 +1,10 @@
 {
     "DEBUG": true,
     "TIMER": {
-        "timer01": 36000
+        "1min": 60000,
+        "10min": 600000,
+        "30min": 1800000,
+        "1hour": 3600000
     },
     "RUNTIME_NAME": "Python37"
 }
