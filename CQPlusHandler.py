@@ -187,7 +187,7 @@ class MainHandler(cqplus.CQPlusHandler):
         # 菜单动作
         # if event == 'on_menu':
         #     if params['name'] == 'menu01':
-        #         self.api.send_group_msg(562360425, '菜单01被点击')
+        #         self.api.send_private_msg(inst['10'], '菜单01被点击')
 
         # 处理私聊消息
         # if event == "on_private_msg":
