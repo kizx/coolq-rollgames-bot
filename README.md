@@ -1,6 +1,7 @@
 ## coolq-rollgames-bot
 基于酷Q的自助Roll游戏插件  
-本插件基于慕晓飞大神开发的[`酷Q Python SDK`](https://gitee.com/muxiaofei/coolq_sdk_x/wikis/pages "酷Q SDK-X") 编写
+本插件基于慕晓飞大神开发的[`酷Q Python SDK`](https://gitee.com/muxiaofei/coolq_sdk_x/wikis/pages "酷Q SDK-X") 编写  
+使用参考：https://www.2bboy.com/archives/3.html
 
 ## 介绍<br>
 * 群友自助进行Roll游戏活动

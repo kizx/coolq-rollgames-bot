@@ -196,7 +196,7 @@ class MainHandler(cqplus.CQPlusHandler):
         #     self.api.send_private_msg(inst['10'], str(qq) + '发送了：' + msg)
 
 
-inst = {'0': '查看命令', '2': '!!!我要roll游戏#', '3': '我要参加roll游戏', '4': '查看名单',
+inst = {'0': '查看命令', '2': '!!!我要roll游戏', '3': '我要参加roll游戏', '4': '查看名单',
         '6': '结束活动', '7': '查看当前活动', '9': '!!!开始roll游戏', '10': 3317200497, '11': '定时器'}
 dic1 = {'查看命令': Handle.menu, '查看当前活动': Handle.view_acti}
 dic2 = {'!!!我要roll游戏': sqlHandle.create, '我要参加roll游戏': sqlHandle.join, '查看名单': sqlHandle.view_memb,
